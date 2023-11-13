@@ -130,10 +130,11 @@ for (larfg, elty) in
         function larfg!(x::AbstractVector{$elty})
             N    = BlasInt(length(x))
             incx = stride(x, 1)
+            α    = Ref{$elty}(x[1])
             τ    = Ref{$elty}(0)
             ccall((@blasfunc($larfg), liblapack), Cvoid,
-                (Ref{BlasInt}, Ptr{$elty}, Ptr{$elty}, Ref{BlasInt}, Ref{$elty}),
-                N, x, pointer(x, 2), incx, τ)
+                (Ref{BlasInt}, Ref{$elty}, Ptr{$elty}, Ref{BlasInt}, Ref{$elty}),
+                N, α, pointer(x, 2), incx, τ)
             β = x[1]
             @inbounds x[1] = one($elty)
             return τ[], β
